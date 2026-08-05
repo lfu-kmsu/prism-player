@@ -149,7 +149,7 @@
                 e.stopPropagation();
                 removeFromQueue(e, index);
               }}
-              class="group/x flex flex-none items-center justify-center h-full w-6"
+              class="group/x flex flex-none items-center justify-center h-full w-6 overflow-hidden"
             >
               <X
                 class="h-full group-hover/x:scale-110 group-active/x:scale-90 transition-transform"
