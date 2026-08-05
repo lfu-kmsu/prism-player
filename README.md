@@ -1,6 +1,6 @@
 # PrismPlayer
 
-A full-stack music player player written from scratch using web technologies.
+A full-stack music player written from scratch using web technologies.
 
 ## For Developers
 
