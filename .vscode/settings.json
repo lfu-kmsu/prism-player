@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "markdown.validate.enabled": true
+}
