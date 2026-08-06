@@ -50,6 +50,13 @@
     const queue = filteredSongs.map(toCurrentSong);
     playerStore.play(queue[0], queue);
   }
+
+  function queueFilteredSongs() {
+    if (filteredSongs.length === 0) return;
+    for (const song of filteredSongs) {
+      playerStore.addToQueue(song);
+    }
+  }
 </script>
 
 <!-- HTML ==========================================================================================================================================-->
@@ -76,17 +83,17 @@
         />
       </div>
 
-      <!-- ADD BUTTON -->
+      <!-- FILTERED ADD BUTTON -->
       <button
         class="group flex flex-none items-center justify-center h-full aspect-square"
-        onclick={playFilteredSongs}
+        onclick={queueFilteredSongs}
       >
         <Plus
           class="h-full aspect-square group-hover:scale-110 group-active:scale-90 transition-transform"
         />
       </button>
 
-      <!-- GLOBAL PLAY BUTTON -->
+      <!-- FILTERED PLAY BUTTON -->
       <button
         class="group flex flex-none items-center justify-center h-full aspect-square"
         onclick={playFilteredSongs}
