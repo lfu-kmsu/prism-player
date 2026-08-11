@@ -182,7 +182,7 @@
     <!-- GRID VIEW --------------------------------------------------------------------------------------------------------------->
   {:else}
     <div
-      class="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] h-full w-full gap-2 justify-start"
+      class="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] content-start h-full w-full gap-2 justify-start"
     >
       {#each filteredSongs as song}
         <ContextMenu.Root>
