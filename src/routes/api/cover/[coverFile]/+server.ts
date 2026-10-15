@@ -12,12 +12,14 @@ const EXT_TO_MIME: Record<string, string> = {
 };
 
 export const GET: RequestHandler = async ({ params }) => {
-  if (!/^[a-z0-9]+\.[a-z0-9]+$/i.test(params.coverFile)) throw error(400, 'Invalid cover id');
+  if (!/^[a-z0-9]+\.[a-z0-9]+$/i.test(params.coverFile)) throw error(400, 'Invalid cover id'); // Security guard: prevents malicious path injection
 
+  // Retrieve image type
   const ext = path.extname(params.coverFile).slice(1).toLowerCase();
   const contentType = EXT_TO_MIME[ext];
   if (!contentType) throw error(400, 'Unsupported cover format');
 
+  // Retrieve actual image
   const file = Bun.file(path.join(COVERS_DIR, params.coverFile));
   if (!(await file.exists())) throw error(404, 'Cover missing on disk');
 

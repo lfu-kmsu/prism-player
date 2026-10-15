@@ -41,7 +41,7 @@ class PlayerStore {
   }
 
   playAt(index: number) {
-    if (index < 0 || index >= this.queue.length) return;
+    if (index < 0 || index >= this.queue.length) return; // Reject invalid positions
     this.queueIndex = index;
     this.current = this.queue[index];
   }
@@ -51,31 +51,28 @@ class PlayerStore {
     this.queue = [...this.queue, song];
 
     if (wasEmpty) {
-      // First song added to an empty queue — start playing it immediately.
+      // First song added to empty queue => play immediately.
       this.queueIndex = 0;
       this.current = song;
     }
   }
 
   removeFromQueue(index: number) {
-    if (index < 0 || index >= this.queue.length) return;
+    if (index < 0 || index >= this.queue.length) return; // Reject invalid indexes
 
     const removedWasCurrent = index === this.queueIndex;
-    this.queue = this.queue.filter((_, i) => i !== index);
+    this.queue = this.queue.filter((_, i) => i !== index); // Callback retains the entire queue, except index
 
-    if (this.queue.length === 0) {
-      // That was the last song — stop playback entirely.
+    if (this.queue.length === 0) { // If last song was just removed
       this.current = null;
       this.queueIndex = -1;
       return;
     }
 
     if (index < this.queueIndex) {
-      this.queueIndex -= 1; // shift pointer left so it still targets the same actual song
+      this.queueIndex -= 1; // Shift pointer left so it still targets the same song
     } else if (removedWasCurrent) {
-      // The playing song itself was removed — advance to whatever now
-      // occupies that slot, and actually update `current` to match it
-      // (previously only queueIndex moved, leaving `current` stale).
+      // Advance to what now occupies current index
       this.queueIndex = Math.min(this.queueIndex, this.queue.length - 1);
       this.current = this.queue[this.queueIndex];
     }
@@ -100,10 +97,10 @@ class PlayerStore {
   private shuffle() {
     if (this.queue.length <= 1) return;
 
-    this.preShuffleQueue = [...this.queue]; // snapshot of pre-shuffled queue, required for unshuffling
+    this.preShuffleQueue = [...this.queue]; // Snapshot of pre-shuffled queue, required for unshuffling
 
-    const played = this.queue.slice(0, this.queueIndex + 1); // shuffling only what's still to be played
-    const upcoming = this.queue.slice(this.queueIndex + 1);
+    const played = this.queue.slice(0, this.queueIndex + 1); // Preserving what's already played
+    const upcoming = this.queue.slice(this.queueIndex + 1); // Shuffling only what's still to be played
 
     // Fisher-Yates shuffling algorithm
     for (let i = upcoming.length - 1; i > 0; i--) {
@@ -111,7 +108,7 @@ class PlayerStore {
       [upcoming[i], upcoming[j]] = [upcoming[j], upcoming[i]];
     }
 
-    this.queue = [...played, ...upcoming];
+    this.queue = [...played, ...upcoming]; // Reassemble full queue
     this.isShuffled = true;
   }
 
@@ -121,7 +118,9 @@ class PlayerStore {
     // Restores original order but so that queueIndex still points to same song
     const currentId = this.current?.id;
     this.queue = this.preShuffleQueue;
+    // Find out current song's new position in restored queue
     this.queueIndex = currentId ? this.queue.findIndex(s => s.id === currentId) : this.queueIndex;
+
     this.preShuffleQueue = null;
     this.isShuffled = false;
   }

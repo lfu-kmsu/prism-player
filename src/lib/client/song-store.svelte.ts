@@ -17,7 +17,7 @@ class SongStore {
 
   byId: Map<string, Song> = $derived(new Map(this.songs.map(s => [s.id, s])));
 
-  // (Unified) async (non-blocking) library loading function:
+  // Async library loading function:
   // returns in-flight promise if still loading
   load(): Promise<void> {
     if (this.loadedOnce) return Promise.resolve();

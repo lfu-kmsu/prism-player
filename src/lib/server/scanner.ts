@@ -30,7 +30,7 @@ async function walkDir(dir: string, baseDir: string): Promise<string[]> {
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      files.push(...(await walkDir(fullPath, baseDir))); // recursive folder search
+      files.push(...(await walkDir(fullPath, baseDir))); // Recursive folder search
     } else if (SUPPORTED_EXTENSIONS.has(path.extname(entry.name).toLowerCase())) {
       files.push(path.relative(baseDir, fullPath));
     }
@@ -52,10 +52,12 @@ async function applyMetadata(
   stat: { mtimeMs: number; size: number },
 ) {
   const metadata = await parseFile(absolutePath);
-  const extension = path.extname(relativePath).slice(1);
+  const fileExtension = path.extname(relativePath).slice(1); // .slice(1) removes the dot (".mp3" => "mp3")
 
   let coverPath: string | null = null;
-  const picture = metadata.common.picture?.[0];
+  const picture = metadata.common.picture?.[0]; // Track can embed multiple imgs, e.g. front and back. Index [0] => the front image.
+
+  // Writing cache cover to disk
   if (picture) {
     const coverExt = IMAGE_TYPES[picture.format] ?? 'bin';
     coverPath = `${hash}.${coverExt}`;
@@ -77,14 +79,14 @@ async function applyMetadata(
       metadata.common.artist ?? 'Unknown Artist',
       metadata.common.album ?? 'Unknown Album',
       coverPath,
-      extension,
+      fileExtension,
       stat.mtimeMs,
       stat.size,
     ],
   );
 }
 
-// reconciles DB with FS
+// DATABASE RECONCILIATION LOOP =======================================================================
 export async function syncLibrary() {
   const filesOnDisk = await walkDir(LIBRARY_DIR, LIBRARY_DIR);
   const onDiskSet = new Set(filesOnDisk);
@@ -106,28 +108,29 @@ export async function syncLibrary() {
 
     if (existing) {
       const unchanged = existing.file_mtime === stat.mtimeMs && existing.file_size === stat.size;
-      if (unchanged) continue; // file unchanged, no hash needed
+      if (unchanged) continue; // File unchanged, no hash needed
 
       const hash = await fullFileHash(absolutePath);
       if (hash === existing.content_hash) {
-        // hash is the same, just mtime/size changed -> update these in the DB
+        // Hash is the same, but mtime/size changed: update these in the DB
         DB.run('UPDATE songs SET file_mtime = ?, file_size = ? WHERE id = ?', [
           stat.mtimeMs,
           stat.size,
           existing.id,
         ]);
       } else {
-        // hash is different -> reinsert metadata to DB
+        // Hash different: reinsert metadata to DB
         await applyMetadata(existing.id, relativePath, absolutePath, hash, stat);
       }
       continue;
     }
 
-    // No song row with this relativePath -> could be move/rename, or actually new file
+    // No song row with this relativePath: moved/renamed or new file
     const hash = await fullFileHash(absolutePath);
     const movedFrom = missingByHash.get(hash);
 
     if (movedFrom && !claimedMissingIds.has(movedFrom.id)) {
+      // Moved or renamed file
       claimedMissingIds.add(movedFrom.id);
       DB.run('UPDATE songs SET file_path = ?, file_mtime = ?, file_size = ? WHERE id = ?', [
         relativePath,
@@ -136,11 +139,12 @@ export async function syncLibrary() {
         movedFrom.id,
       ]);
     } else {
+      // New file
       await applyMetadata(randomUUID(), relativePath, absolutePath, hash, stat);
     }
   }
 
-  // Rows still unclaimed here = corresponding files are genuinely gone/deleted
+  // Rows still unclaimed here: files genuinely deleted
   for (const row of missingRows) {
     if (!claimedMissingIds.has(row.id)) {
       DB.run('DELETE FROM songs WHERE id = ?', [row.id]);

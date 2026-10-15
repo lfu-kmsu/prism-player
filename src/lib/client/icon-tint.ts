@@ -1,4 +1,4 @@
-import APP_ICON from '$lib/assets/app-icon.svg?raw';
+import APP_ICON from '$lib/assets/app-icon.svg?raw'; // import as raw string
 
 export function tintedIconDataUrl(accentColor: string): string {
   const svg = APP_ICON.replaceAll('%ACCENT%', accentColor);

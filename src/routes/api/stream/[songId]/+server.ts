@@ -35,6 +35,7 @@ export const GET: RequestHandler = async ({ params, request }) => {
   const match = range.match(/bytes=(\d*)-(\d*)/);
   if (!match) throw error(416, 'Malformed Range header');
 
+  // parseInt second arg: base to use when parsing the int, 10 => a string in decimal
   const start = match[1] ? parseInt(match[1], 10) : 0;
   const end = match[2] ? parseInt(match[2], 10) : fileSize - 1;
 
