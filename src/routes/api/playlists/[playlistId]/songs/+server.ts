@@ -1,3 +1,4 @@
+/*
 import { error } from '@sveltejs/kit';
 import { DB } from '$lib/server/db';
 import type { RequestHandler } from './$types';
@@ -24,3 +25,4 @@ export const POST: RequestHandler = async ({ params, request }) => {
 
   return new Response(null, { status: 204 });
 };
+*/

@@ -1,3 +1,4 @@
+/*
 import { error } from '@sveltejs/kit';
 import { DB } from '$lib/server/db';
 import type { RequestHandler } from './$types';
@@ -18,3 +19,4 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
   return new Response(null, { status: 204 });
 };
+*/

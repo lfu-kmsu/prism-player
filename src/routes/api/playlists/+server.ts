@@ -1,3 +1,4 @@
+/*
 import { randomUUID } from 'node:crypto';
 import { error } from '@sveltejs/kit';
 import { DB } from '$lib/server/db';
@@ -36,3 +37,4 @@ export const POST: RequestHandler = async ({ request }) => {
     headers: { 'Content-Type': 'application/json' },
   });
 };
+*/
