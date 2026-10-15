@@ -1,6 +1,6 @@
 {
   "name": "prism-player",
-  "version": "0.0.1",
+  "version": "1.0",
   "devDependencies": {
     "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "^2.63.0",
