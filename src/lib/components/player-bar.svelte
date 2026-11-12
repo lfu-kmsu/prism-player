@@ -35,12 +35,11 @@
       audioEl.currentSrc && new URL(audioEl.currentSrc).pathname === `/api/stream/${song.id}`;
 
     currentTime = 0;
-    audioEl.currentTime = 0; // your fix — always restart position, no exceptions
+    audioEl.currentTime = 0; // always restart position, no exceptions. Fixes an issue where slider and audioEl state were out of sync
 
     if (isSameResource) {
-      // src is unchanged, so loadedmetadata won't fire again — duration would
-      // otherwise stay stuck at whatever it's zeroed to below. Read it directly
-      // from the element, which already knows it.
+      // event listener loadedmetadata fires only if a new audioEl?.duration is reported. Doesn't if the resource is the same => same duration
+      // Slider needs to reuse the same duraton too
       if (Number.isFinite(audioEl.duration)) duration = audioEl.duration;
     } else {
       duration = 0; // genuinely new resource — wait for loadedmetadata as normal
@@ -82,7 +81,7 @@
     }
   }
 
-  // Adjusts time according to the slider's value
+  // Adjusts time indicated according to the slider's value
   $effect(() => {
     if (!audioEl || isSeekDragging) return;
     const onTimeUpdate = () => (currentTime = audioEl?.currentTime);
